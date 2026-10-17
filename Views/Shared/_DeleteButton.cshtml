@@ -1,0 +1,7 @@
+@* Usage: <partial name="_DeleteButton" model="@(new DeleteButtonVM("Movies", movie.Id, movie.Name))" /> *@
+@model DeleteButtonVM
+
+<form asp-controller="@Model.Controller" asp-action="Delete" asp-route-id="@Model.Id" method="post"
+      class="d-inline" data-confirm="Delete &quot;@Model.Name&quot;? This can't be undone.">
+    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+</form>

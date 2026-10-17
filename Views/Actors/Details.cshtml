@@ -1,0 +1,42 @@
+@model Actor
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="page-header">
+    <h1>@Model.Name</h1>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-secondary"><i class="bi bi-pencil"></i> Edit</a>
+        <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card p-4 text-center">
+            <img src="@Model.Img" class="avatar-lg mx-auto mb-3" style="width:160px;height:160px" alt="@Model.Name" />
+            <h2 class="h5 fw-bold">@Model.Name</h2>
+            <p class="text-muted small mb-0">@Model.Bio</p>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">Movies (@Model.MovieActors.Count)</div>
+            <ul class="list-group list-group-flush">
+                @if (!Model.MovieActors.Any())
+                {
+                    <li class="list-group-item text-muted text-center py-4">Not in any movie yet.</li>
+                }
+                @foreach (var ma in Model.MovieActors.Where(x => x.Movie != null))
+                {
+                    var m = ma.Movie!;
+                    <li class="list-group-item d-flex align-items-center gap-2">
+                        <img src="@m.MainImg" class="thumb" alt="" />
+                        <a asp-controller="Movies" asp-action="Details" asp-route-id="@m.Id" class="flex-grow-1 text-decoration-none fw-semibold">@m.Name</a>
+                        <span class="badge @m.Status.BadgeClass()">@m.Status.Label()</span>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

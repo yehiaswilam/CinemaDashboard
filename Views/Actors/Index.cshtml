@@ -1,0 +1,37 @@
+@model List<Actor>
+@{
+    ViewData["Title"] = "Actors";
+}
+
+<div class="page-header">
+    <h1>Actors <span class="text-muted fs-6">(@Model.Count)</span></h1>
+    <div class="d-flex gap-2">
+        <form method="get" class="d-flex">
+            <input name="search" value="@ViewBag.Search" class="form-control" placeholder="Search actors..." />
+        </form>
+        <a asp-action="Create" class="btn btn-primary text-nowrap"><i class="bi bi-plus-lg"></i> Add Actor</a>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card p-5 text-center text-muted">No actors found.</div>
+}
+
+<div class="row g-3">
+    @foreach (var a in Model)
+    {
+        <div class="col-sm-6 col-lg-4 col-xxl-3">
+            <div class="card h-100 text-center p-3">
+                <img src="@a.Img" class="avatar-lg mx-auto mb-2" alt="@a.Name" />
+                <a asp-action="Details" asp-route-id="@a.Id" class="fw-bold text-decoration-none text-body">@a.Name</a>
+                <div class="small text-muted mb-3">@a.MovieActors.Count movies</div>
+                <div class="mt-auto">
+                    <a asp-action="Details" asp-route-id="@a.Id" class="btn btn-sm btn-outline-secondary" title="Details"><i class="bi bi-eye"></i></a>
+                    <a asp-action="Edit" asp-route-id="@a.Id" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>
+                    <partial name="_DeleteButton" model="@(new DeleteButtonVM("Actors", a.Id, a.Name))" />
+                </div>
+            </div>
+        </div>
+    }
+</div>

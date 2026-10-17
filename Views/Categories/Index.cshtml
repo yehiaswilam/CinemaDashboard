@@ -1,0 +1,46 @@
+@model List<Category>
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<div class="page-header">
+    <h1>Categories <span class="text-muted fs-6">(@Model.Count)</span></h1>
+    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add Category</a>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th class="text-center">Movies</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="5" class="text-center text-muted py-4">No categories yet.</td></tr>
+                }
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td class="text-muted">@c.Id</td>
+                        <td class="fw-semibold">@c.Name</td>
+                        <td class="text-muted">@c.Description</td>
+                        <td class="text-center">
+                            <a asp-controller="Movies" asp-action="Index" asp-route-categoryId="@c.Id" class="badge text-bg-light text-decoration-none">@c.Movies.Count</a>
+                        </td>
+                        <td class="text-end text-nowrap">
+                            <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>
+                            <partial name="_DeleteButton" model="@(new DeleteButtonVM("Categories", c.Id, c.Name))" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,39 @@
+@model List<Cinema>
+@{
+    ViewData["Title"] = "Cinemas";
+}
+
+<div class="page-header">
+    <h1>Cinemas <span class="text-muted fs-6">(@Model.Count)</span></h1>
+    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add Cinema</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card p-5 text-center text-muted">No cinemas yet.</div>
+}
+
+<div class="row g-3">
+    @foreach (var c in Model)
+    {
+        <div class="col-sm-6 col-lg-4 col-xxl-3">
+            <div class="card h-100">
+                <img src="@c.Img" class="cover" alt="@c.Name" />
+                <div class="card-body">
+                    <h2 class="h6 fw-bold mb-1">@c.Name</h2>
+                    @if (!string.IsNullOrEmpty(c.Address))
+                    {
+                        <div class="small text-muted mb-2"><i class="bi bi-geo-alt"></i> @c.Address</div>
+                    }
+                    <a asp-controller="Movies" asp-action="Index" asp-route-cinemaId="@c.Id" class="badge text-bg-light text-decoration-none">
+                        <i class="bi bi-camera-reels"></i> @c.Movies.Count movies
+                    </a>
+                </div>
+                <div class="card-footer bg-white text-end">
+                    <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>
+                    <partial name="_DeleteButton" model="@(new DeleteButtonVM("Cinemas", c.Id, c.Name))" />
+                </div>
+            </div>
+        </div>
+    }
+</div>

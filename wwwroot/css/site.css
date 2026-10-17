@@ -1,0 +1,112 @@
+:root {
+    --sidebar-w: 240px;
+    --sidebar-bg: #14161f;
+    --sidebar-fg: #a9adbd;
+    --accent: #e5484d;
+    --bg: #f5f6fa;
+}
+
+body { background: var(--bg); font-size: .95rem; }
+
+.app { display: flex; min-height: 100vh; }
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+    width: var(--sidebar-w);
+    background: var(--sidebar-bg);
+    color: var(--sidebar-fg);
+    position: fixed; inset: 0 auto 0 0;
+    padding: 1.25rem .75rem;
+    z-index: 1030;
+    transition: transform .2s ease;
+}
+.sidebar .brand {
+    display: flex; align-items: center; gap: .5rem;
+    color: #fff; text-decoration: none;
+    font-weight: 700; font-size: 1.2rem;
+    padding: 0 .75rem 1.25rem;
+}
+.sidebar .brand i { color: var(--accent); font-size: 1.5rem; }
+.sidebar .nav-link {
+    color: var(--sidebar-fg);
+    border-radius: .5rem;
+    padding: .6rem .75rem;
+    margin-bottom: .15rem;
+    display: flex; align-items: center; gap: .6rem;
+}
+.sidebar .nav-link:hover { background: rgba(255,255,255,.06); color: #fff; }
+.sidebar .nav-link.active { background: var(--accent); color: #fff; }
+
+/* ---------- Main ---------- */
+.main { flex: 1; margin-left: var(--sidebar-w); min-width: 0; }
+.topbar {
+    background: #fff; border-bottom: 1px solid #e7e8ee;
+    height: 56px; padding: 0 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 1020;
+}
+.content { padding: 1.5rem; }
+
+@media (max-width: 991.98px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; }
+    .content { padding: 1rem; }
+}
+
+/* ---------- Page header ---------- */
+.page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem;
+}
+.page-header h1 { font-size: 1.4rem; font-weight: 700; margin: 0; }
+
+.card { border: 1px solid #e7e8ee; border-radius: .75rem; box-shadow: 0 1px 2px rgba(16,24,40,.04); }
+.card-header { background: #fff; font-weight: 600; border-bottom: 1px solid #eef0f4; }
+
+.btn-primary { background: var(--accent); border-color: var(--accent); }
+.btn-primary:hover, .btn-primary:focus { background: #cc3a3f; border-color: #cc3a3f; }
+
+/* ---------- Stat cards ---------- */
+.stat-card { display: flex; align-items: center; gap: 1rem; padding: 1.1rem 1.25rem; }
+.stat-icon {
+    width: 48px; height: 48px; border-radius: .75rem;
+    display: grid; place-items: center; font-size: 1.4rem;
+}
+.stat-value { font-size: 1.6rem; font-weight: 700; line-height: 1; }
+.stat-label { color: #6b7080; font-size: .85rem; }
+
+/* ---------- Images ---------- */
+.thumb { width: 48px; height: 64px; object-fit: cover; border-radius: .4rem; background: #e9ebf0; }
+.thumb-lg { width: 110px; height: 80px; object-fit: cover; border-radius: .5rem; margin: 0 .5rem .5rem 0; }
+.avatar { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; background: #e9ebf0; }
+.avatar-lg { width: 96px; height: 96px; object-fit: cover; border-radius: 50%; }
+.cover { width: 100%; height: 170px; object-fit: cover; border-radius: .75rem .75rem 0 0; background: #e9ebf0; }
+.poster { width: 100%; max-height: 460px; object-fit: cover; border-radius: .75rem; }
+.preview { max-width: 220px; max-height: 160px; object-fit: cover; border-radius: .5rem; }
+
+/* ---------- Actor picker ---------- */
+.actor-picker {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: .5rem; max-height: 260px; overflow-y: auto;
+    border: 1px solid #dee2e6; border-radius: .5rem; padding: .5rem;
+}
+.actor-option {
+    display: flex; align-items: center; gap: .5rem;
+    padding: .4rem .5rem; border-radius: .5rem; cursor: pointer;
+    border: 1px solid transparent;
+}
+.actor-option:hover { background: #f5f6fa; }
+.actor-option:has(input:checked) { border-color: var(--accent); background: #fff1f1; }
+.actor-option input { margin: 0; }
+
+.sub-img-box { position: relative; display: inline-block; }
+.sub-img-box label {
+    position: absolute; top: 4px; right: 12px;
+    background: rgba(0,0,0,.6); color: #fff; font-size: .75rem;
+    padding: 1px 6px; border-radius: .3rem; cursor: pointer;
+}
+
+.table > :not(caption) > * > * { vertical-align: middle; }
+.bar { height: 8px; border-radius: 4px; background: #eef0f4; overflow: hidden; }
+.bar > span { display: block; height: 100%; background: var(--accent); }

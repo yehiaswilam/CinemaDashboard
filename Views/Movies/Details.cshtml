@@ -1,0 +1,76 @@
+@model Movie
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="page-header">
+    <h1>@Model.Name <span class="badge @Model.Status.BadgeClass() fs-6 align-middle">@Model.Status.Label()</span></h1>
+    <div class="d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-secondary"><i class="bi bi-pencil"></i> Edit</a>
+        <partial name="_DeleteButton" model="@(new DeleteButtonVM("Movies", Model.Id, Model.Name))" />
+        <a asp-action="Index" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-4">
+        <img src="@Model.MainImg" class="poster" alt="@Model.Name" />
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-body">
+                <p>@Model.Description</p>
+                <div class="row g-3 small">
+                    <div class="col-sm-6 col-md-3">
+                        <div class="text-muted">Category</div>
+                        <div class="fw-semibold">@Model.Category?.Name</div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <div class="text-muted">Cinema</div>
+                        <div class="fw-semibold">@Model.Cinema?.Name</div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <div class="text-muted">Show time</div>
+                        <div class="fw-semibold">@Model.DateTime.ToString("dd MMM yyyy, hh:mm tt")</div>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <div class="text-muted">Price</div>
+                        <div class="fw-semibold">@Model.Price.ToString("0.00")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">Actors (@Model.MovieActors.Count)</div>
+            <div class="card-body d-flex flex-wrap gap-3">
+                @if (!Model.MovieActors.Any())
+                {
+                    <span class="text-muted">No actors assigned.</span>
+                }
+                @foreach (var ma in Model.MovieActors.Where(x => x.Actor != null))
+                {
+                    <a asp-controller="Actors" asp-action="Details" asp-route-id="@ma.ActorId" class="text-center text-decoration-none text-body" style="width:90px">
+                        <img src="@ma.Actor!.Img" class="avatar-lg" style="width:72px;height:72px" alt="" />
+                        <div class="small mt-1">@ma.Actor.Name</div>
+                    </a>
+                }
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Gallery (@Model.SubImages.Count)</div>
+            <div class="card-body">
+                @if (!Model.SubImages.Any())
+                {
+                    <span class="text-muted">No sub images.</span>
+                }
+                @foreach (var img in Model.SubImages)
+                {
+                    <a href="@img.Img" target="_blank"><img src="@img.Img" class="thumb-lg" alt="" /></a>
+                }
+            </div>
+        </div>
+    </div>
+</div>

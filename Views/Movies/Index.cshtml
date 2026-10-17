@@ -1,0 +1,86 @@
+@model List<Movie>
+@{
+    ViewData["Title"] = "Movies";
+    var currentStatus = ViewBag.Status as MovieStatus?;
+}
+
+<div class="page-header">
+    <h1>Movies <span class="text-muted fs-6">(@Model.Count)</span></h1>
+    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Add Movie</a>
+</div>
+
+<!-- Filters -->
+<form method="get" class="card p-3 mb-3">
+    <div class="row g-2">
+        <div class="col-md-4">
+            <input name="search" value="@ViewBag.Search" class="form-control" placeholder="Search by name..." />
+        </div>
+        <div class="col-md-2">
+            <select name="categoryId" class="form-select" asp-items="ViewBag.Categories">
+                <option value="">All categories</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="cinemaId" class="form-select" asp-items="ViewBag.Cinemas">
+                <option value="">All cinemas</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="status" class="form-select">
+                <option value="">All statuses</option>
+                @foreach (var s in Enum.GetValues<MovieStatus>())
+                {
+                    <option value="@s" selected="@(currentStatus == s)">@s.Label()</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button class="btn btn-dark flex-grow-1"><i class="bi bi-funnel"></i> Filter</button>
+            <a asp-action="Index" class="btn btn-outline-secondary" title="Reset"><i class="bi bi-x-lg"></i></a>
+        </div>
+    </div>
+</form>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Cinema</th>
+                    <th>Show Time</th>
+                    <th class="text-end">Price</th>
+                    <th>Status</th>
+                    <th class="text-center">Actors</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="9" class="text-center text-muted py-4">No movies found.</td></tr>
+                }
+                @foreach (var m in Model)
+                {
+                    <tr>
+                        <td style="width:60px"><img src="@m.MainImg" class="thumb" alt="" /></td>
+                        <td><a asp-action="Details" asp-route-id="@m.Id" class="fw-semibold text-decoration-none">@m.Name</a></td>
+                        <td>@m.Category?.Name</td>
+                        <td>@m.Cinema?.Name</td>
+                        <td class="text-nowrap">@m.DateTime.ToString("dd MMM yyyy, hh:mm tt")</td>
+                        <td class="text-end text-nowrap">@m.Price.ToString("0.00")</td>
+                        <td><span class="badge @m.Status.BadgeClass()">@m.Status.Label()</span></td>
+                        <td class="text-center">@m.MovieActors.Count</td>
+                        <td class="text-end text-nowrap">
+                            <a asp-action="Details" asp-route-id="@m.Id" class="btn btn-sm btn-outline-secondary" title="Details"><i class="bi bi-eye"></i></a>
+                            <a asp-action="Edit" asp-route-id="@m.Id" class="btn btn-sm btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>
+                            <partial name="_DeleteButton" model="@(new DeleteButtonVM("Movies", m.Id, m.Name))" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
