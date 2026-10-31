@@ -1,0 +1,55 @@
+@model CustomerHomeVM
+@{
+    ViewData["Title"] = "Movies";
+}
+
+<section class="site-hero mb-4">
+    <h1 class="fw-bold mb-1">What's on</h1>
+    <p class="text-muted mb-3">Find a movie, see where it's playing and when.</p>
+
+    <form method="get" class="row g-2">
+        <div class="col-md-6">
+            <input name="search" value="@Model.Search" class="form-control" placeholder="Search movies..." />
+        </div>
+        <div class="col-md-4">
+            <select name="categoryId" class="form-select" asp-items="Model.Categories">
+                <option value="">All categories</option>
+            </select>
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button class="btn btn-primary flex-grow-1"><i class="bi bi-search"></i> Search</button>
+            @if (Model.IsFiltered)
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary" title="Clear"><i class="bi bi-x-lg"></i></a>
+            }
+        </div>
+    </form>
+</section>
+
+<section class="mb-5">
+    <h2 class="section-title">Now showing <span>@Model.NowShowing.Count</span></h2>
+    @if (!Model.NowShowing.Any())
+    {
+        <p class="text-muted">Nothing showing right now@(Model.IsFiltered ? " for this search" : "").</p>
+    }
+    <div class="row g-3">
+        @foreach (var movie in Model.NowShowing)
+        {
+            <partial name="_MovieCard" model="movie" />
+        }
+    </div>
+</section>
+
+<section>
+    <h2 class="section-title">Coming soon <span>@Model.Upcoming.Count</span></h2>
+    @if (!Model.Upcoming.Any())
+    {
+        <p class="text-muted">No upcoming movies@(Model.IsFiltered ? " for this search" : "").</p>
+    }
+    <div class="row g-3">
+        @foreach (var movie in Model.Upcoming)
+        {
+            <partial name="_MovieCard" model="movie" />
+        }
+    </div>
+</section>

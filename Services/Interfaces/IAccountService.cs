@@ -9,4 +9,5 @@ public interface IAccountService
     Task<ServiceResult> RegisterAsync(RegisterVM vm);
     Task<ServiceResult> LoginAsync(LoginVM vm);
     Task LogoutAsync();
+    Task<bool> IsAdminAsync(string email);
 }

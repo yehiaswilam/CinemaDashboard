@@ -1,0 +1,17 @@
+@model Movie
+
+<div class="col-6 col-md-4 col-lg-3">
+    <a asp-area="Customer" asp-controller="Movies" asp-action="Details" asp-route-id="@Model.Id" class="movie-card">
+        <div class="movie-poster">
+            <img src="@Model.MainImg" alt="@Model.Name" loading="lazy" />
+            <span class="movie-price">@Model.Price.ToString("0.00") EGP</span>
+        </div>
+        <div class="movie-info">
+            <h3 class="movie-title">@Model.Name</h3>
+            <div class="movie-meta">
+                @Model.Category?.Name · @Model.DateTime.ToString("dd MMM, hh:mm tt")
+            </div>
+            <div class="movie-meta"><i class="bi bi-geo-alt"></i> @Model.Cinema?.Name</div>
+        </div>
+    </a>
+</div>

@@ -1,11 +1,11 @@
-using CinemaDashboard.Controllers.Base;
 using CinemaDashboard.Extensions;
 using CinemaDashboard.Models;
 using CinemaDashboard.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CinemaDashboard.Controllers;
+namespace CinemaDashboard.Areas.Admin.Controllers;
 
+[Area("Admin")]
 public class CinemasController(ICinemaService cinemas) : AdminController
 {
     public async Task<IActionResult> Index() => View(await cinemas.GetAllAsync());

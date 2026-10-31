@@ -1,0 +1,64 @@
+@model Movie
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<a asp-controller="Home" asp-action="Index" class="btn btn-sm btn-link px-0 mb-3"><i class="bi bi-arrow-left"></i> All movies</a>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <img src="@Model.MainImg" class="poster" alt="@Model.Name" />
+    </div>
+
+    <div class="col-md-8">
+        <span class="badge @Model.Status.BadgeClass() mb-2">@Model.Status.Label()</span>
+        <h1 class="fw-bold">@Model.Name</h1>
+        <p class="lead fs-6">@Model.Description</p>
+
+        <div class="row g-3 my-3">
+            <div class="col-6 col-lg-3">
+                <div class="info-box"><div class="text-muted small">Category</div><div class="fw-semibold">@Model.Category?.Name</div></div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="info-box"><div class="text-muted small">Cinema</div><div class="fw-semibold">@Model.Cinema?.Name</div></div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="info-box"><div class="text-muted small">Show time</div><div class="fw-semibold">@Model.DateTime.ToString("dd MMM, hh:mm tt")</div></div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="info-box"><div class="text-muted small">Ticket</div><div class="fw-semibold">@Model.Price.ToString("0.00") EGP</div></div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.Cinema?.Address))
+        {
+            <p class="text-muted small"><i class="bi bi-geo-alt"></i> @Model.Cinema.Address</p>
+        }
+
+        <h2 class="section-title mt-4">Cast</h2>
+        @if (!Model.MovieActors.Any())
+        {
+            <p class="text-muted">No cast listed.</p>
+        }
+        <div class="d-flex flex-wrap gap-3">
+            @foreach (var ma in Model.MovieActors.Where(x => x.Actor != null))
+            {
+                <a asp-controller="Actors" asp-action="Details" asp-route-id="@ma.ActorId" class="cast-item">
+                    <img src="@ma.Actor!.Img" class="avatar-lg" alt="" />
+                    <div class="small mt-1">@ma.Actor.Name</div>
+                </a>
+            }
+        </div>
+
+        @if (Model.SubImages.Any())
+        {
+            <h2 class="section-title mt-4">Gallery</h2>
+            <div>
+                @foreach (var img in Model.SubImages)
+                {
+                    <a href="@img.Img" target="_blank"><img src="@img.Img" class="thumb-lg" alt="" /></a>
+                }
+            </div>
+        }
+    </div>
+</div>

@@ -1,0 +1,40 @@
+@model Actor
+@{
+    ViewData["Title"] = Model.Name;
+    var movies = Model.MovieActors
+        .Where(ma => ma.Movie != null && ma.Movie.Status != MovieStatus.Expired)
+        .Select(ma => ma.Movie!)
+        .OrderByDescending(m => m.DateTime)
+        .ToList();
+}
+
+<a asp-controller="Home" asp-action="Index" class="btn btn-sm btn-link px-0 mb-3"><i class="bi bi-arrow-left"></i> All movies</a>
+
+<div class="row g-4">
+    <div class="col-md-4 text-center">
+        <img src="@Model.Img" class="avatar-lg mb-3" style="width:180px;height:180px" alt="@Model.Name" />
+        <h1 class="h3 fw-bold">@Model.Name</h1>
+        <p class="text-muted">@Model.Bio</p>
+    </div>
+
+    <div class="col-md-8">
+        <h2 class="section-title">Movies <span>@movies.Count</span></h2>
+        @if (!movies.Any())
+        {
+            <p class="text-muted">No movies showing with @Model.Name right now.</p>
+        }
+        <div class="list-group">
+            @foreach (var m in movies)
+            {
+                <a asp-controller="Movies" asp-action="Details" asp-route-id="@m.Id" class="list-group-item list-group-item-action d-flex align-items-center gap-3">
+                    <img src="@m.MainImg" class="thumb" alt="" />
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold">@m.Name</div>
+                        <div class="small text-muted">@m.DateTime.ToString("dd MMM yyyy, hh:mm tt")</div>
+                    </div>
+                    <span class="badge @m.Status.BadgeClass()">@m.Status.Label()</span>
+                </a>
+            }
+        </div>
+    </div>
+</div>

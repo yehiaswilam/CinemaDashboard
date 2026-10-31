@@ -1,17 +1,20 @@
+using CinemaDashboard.Constants;
 using CinemaDashboard.Extensions;
 using CinemaDashboard.Services.Interfaces;
 using CinemaDashboard.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CinemaDashboard.Controllers;
+namespace CinemaDashboard.Areas.Identity.Controllers;
 
+// /Identity/Account/Login, /Identity/Account/Register ...
+[Area("Identity")]
 [AllowAnonymous]
 public class AccountController(IAccountService account) : Controller
 {
     public IActionResult Login(string? returnUrl = null)
     {
-        if (User.Identity?.IsAuthenticated == true) return RedirectToAction("Index", "Home");
+        if (User.Identity?.IsAuthenticated == true) return RedirectToHome();
         return View(new LoginVM { ReturnUrl = returnUrl });
     }
 
@@ -27,14 +30,17 @@ public class AccountController(IAccountService account) : Controller
             return View(vm);
         }
 
-        return Url.IsLocalUrl(vm.ReturnUrl)
-            ? LocalRedirect(vm.ReturnUrl!)
-            : RedirectToAction("Index", "Home");
+        if (Url.IsLocalUrl(vm.ReturnUrl)) return LocalRedirect(vm.ReturnUrl!);
+
+        // The User principal isn't refreshed until the next request, so ask the service for the role
+        return await account.IsAdminAsync(vm.Email)
+            ? RedirectToAction("Index", "Home", new { area = "Admin" })
+            : RedirectToAction("Index", "Home", new { area = "Customer" });
     }
 
     public IActionResult Register()
     {
-        if (User.Identity?.IsAuthenticated == true) return RedirectToAction("Index", "Home");
+        if (User.Identity?.IsAuthenticated == true) return RedirectToHome();
         return View(new RegisterVM());
     }
 
@@ -51,15 +57,20 @@ public class AccountController(IAccountService account) : Controller
         }
 
         TempData["Success"] = result.Message;
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction("Index", "Home", new { area = "Customer" });
     }
 
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
         await account.LogoutAsync();
-        return RedirectToAction(nameof(Login));
+        return RedirectToAction("Index", "Home", new { area = "Customer" });
     }
 
     public IActionResult AccessDenied() => View();
+
+    private IActionResult RedirectToHome() =>
+        User.IsInRole(AppRoles.Admin)
+            ? RedirectToAction("Index", "Home", new { area = "Admin" })
+            : RedirectToAction("Index", "Home", new { area = "Customer" });
 }

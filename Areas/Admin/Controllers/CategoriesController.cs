@@ -1,12 +1,12 @@
-using CinemaDashboard.Controllers.Base;
 using CinemaDashboard.Extensions;
 using CinemaDashboard.Models;
 using CinemaDashboard.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CinemaDashboard.Controllers;
+namespace CinemaDashboard.Areas.Admin.Controllers;
 
 // Thin controller: HTTP in / view out. All rules live in ICategoryService (SRP + DIP).
+[Area("Admin")]
 public class CategoriesController(ICategoryService categories) : AdminController
 {
     public async Task<IActionResult> Index() => View(await categories.GetAllAsync());

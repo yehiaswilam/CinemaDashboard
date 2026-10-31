@@ -1,10 +1,10 @@
 using System.Security.Claims;
-using CinemaDashboard.Controllers.Base;
 using CinemaDashboard.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CinemaDashboard.Controllers;
+namespace CinemaDashboard.Areas.Admin.Controllers;
 
+[Area("Admin")]
 public class UsersController(IUserService users) : AdminController
 {
     private string CurrentUserId => User.FindFirstValue(ClaimTypes.NameIdentifier)!;

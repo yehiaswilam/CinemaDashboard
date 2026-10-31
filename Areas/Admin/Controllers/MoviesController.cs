@@ -1,12 +1,12 @@
-using CinemaDashboard.Controllers.Base;
 using CinemaDashboard.Extensions;
 using CinemaDashboard.Models;
 using CinemaDashboard.Services.Interfaces;
 using CinemaDashboard.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CinemaDashboard.Controllers;
+namespace CinemaDashboard.Areas.Admin.Controllers;
 
+[Area("Admin")]
 public class MoviesController(IMovieService movies, ILookupService lookups) : AdminController
 {
     // GET: /Movies?search=&categoryId=&cinemaId=&status=

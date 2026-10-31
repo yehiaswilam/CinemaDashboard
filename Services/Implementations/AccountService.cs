@@ -44,6 +44,12 @@ public class AccountService(
 
     public Task LogoutAsync() => signInManager.SignOutAsync();
 
+    public async Task<bool> IsAdminAsync(string email)
+    {
+        var user = await userManager.FindByEmailAsync(email);
+        return user is not null && await userManager.IsInRoleAsync(user, AppRoles.Admin);
+    }
+
     private static ServiceResult ToResult(IdentityResult identity)
     {
         var result = new ServiceResult();

@@ -16,7 +16,7 @@ await DbSeeder.SeedAsync(app.Services);
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Customer/Home/Error");
     app.UseHsts();
 }
 
@@ -32,8 +32,10 @@ app.UseRouting();
 app.UseAuthentication(); // who are you?  (must come before UseAuthorization)
 app.UseAuthorization();  // are you allowed?
 
+// Every URL starts with its area:  /Admin/Movies/Edit/5 · /Identity/Account/Login · /Customer/Movies/Details/3
+// "/" alone opens the Customer area (the public site).
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

@@ -3,7 +3,7 @@ using CinemaDashboard.Services.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CinemaDashboard.Controllers.Base;
+namespace CinemaDashboard.Areas.Admin.Controllers;
 
 /// <summary>
 /// Base for every dashboard controller: only Admins can reach them,
