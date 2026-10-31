@@ -1,0 +1,42 @@
+@model RegisterVM
+@{
+    ViewData["Title"] = "Create account";
+    Layout = "_AuthLayout";
+}
+
+<h1 class="h4 fw-bold mb-1">Create an account</h1>
+<p class="text-muted small mb-4">An admin needs to approve you before you can open the dashboard.</p>
+
+<form asp-action="Register" method="post">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+    <div class="mb-3">
+        <label asp-for="FullName" class="form-label"></label>
+        <input asp-for="FullName" class="form-control" autocomplete="name" autofocus />
+        <span asp-validation-for="FullName" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" autocomplete="email" />
+        <span asp-validation-for="Email" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label"></label>
+        <input asp-for="Password" class="form-control" autocomplete="new-password" />
+        <span asp-validation-for="Password" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ConfirmPassword" class="form-label"></label>
+        <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Create account</button>
+</form>
+
+<p class="text-center small mt-4 mb-0">
+    Already have an account? <a asp-action="Login">Sign in</a>
+</p>

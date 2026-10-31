@@ -1,0 +1,36 @@
+@model LoginVM
+@{
+    ViewData["Title"] = "Sign in";
+    Layout = "_AuthLayout";
+}
+
+<h1 class="h4 fw-bold mb-1">Welcome back</h1>
+<p class="text-muted small mb-4">Sign in to manage your cinema.</p>
+
+<form asp-action="Login" method="post">
+    <input type="hidden" asp-for="ReturnUrl" />
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" autocomplete="username" autofocus />
+        <span asp-validation-for="Email" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label"></label>
+        <input asp-for="Password" class="form-control" autocomplete="current-password" />
+        <span asp-validation-for="Password" class="text-danger small"></span>
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="RememberMe" class="form-check-input" />
+        <label asp-for="RememberMe" class="form-check-label"></label>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Sign in</button>
+</form>
+
+<p class="text-center small mt-4 mb-0">
+    No account? <a asp-action="Register">Create one</a>
+</p>

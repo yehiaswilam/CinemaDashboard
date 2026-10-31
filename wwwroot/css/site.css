@@ -41,7 +41,7 @@ body { background: var(--bg); font-size: .95rem; }
 .main { flex: 1; margin-left: var(--sidebar-w); min-width: 0; }
 .topbar {
     background: #fff; border-bottom: 1px solid #e7e8ee;
-    height: 56px; padding: 0 1.5rem;
+    height: 56px; padding: 0 1.5rem; gap: .75rem;
     display: flex; align-items: center; justify-content: space-between;
     position: sticky; top: 0; z-index: 1020;
 }
@@ -110,3 +110,17 @@ body { background: var(--bg); font-size: .95rem; }
 .table > :not(caption) > * > * { vertical-align: middle; }
 .bar { height: 8px; border-radius: 4px; background: #eef0f4; overflow: hidden; }
 .bar > span { display: block; height: 100%; background: var(--accent); }
+
+.sidebar .nav-section {
+    font-size: .7rem; text-transform: uppercase; letter-spacing: .08em;
+    color: #6b7080; padding: 1rem .75rem .35rem;
+}
+
+/* ---------- Auth pages (Login / Register / Access denied) ---------- */
+.auth-page {
+    min-height: 100vh; display: grid; place-items: center;
+    padding: 1rem; background: var(--sidebar-bg);
+}
+.auth-card { width: 100%; max-width: 420px; }
+.auth-brand { display: flex; align-items: center; gap: .5rem; font-weight: 700; font-size: 1.25rem; }
+.auth-brand i { color: var(--accent); font-size: 1.6rem; }

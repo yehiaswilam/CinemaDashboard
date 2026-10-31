@@ -1,52 +1,56 @@
 # Cinema Dashboard — ASP.NET Core MVC (.NET 10)
 
-لوحة تحكم لإدارة سينما: Categories, Cinemas, Movies, Actors + صفحة رئيسية فيها إحصائيات.
+لوحة تحكم لإدارة سينما: Categories, Cinemas, Movies, Actors + صفحة رئيسية فيها إحصائيات،
+مع تسجيل دخول بـ **ASP.NET Core Identity** وكود متقسم على مبادئ **SOLID**.
 
-## التشغيل (Visual Studio 2026 / .NET 10)
+## التشغيل
 
-1. افتح `CinemaDashboard.csproj` في Visual Studio.
-2. افتح `appsettings.json` وظبط اسم السيرفر في الـ Connection String
-   على حسب اللي بتكتبه في SSMS في خانة **Server name**:
-   - `Server=.` → لو السيرفر الافتراضي (MSSQLSERVER)
-   - `Server=.\\SQLEXPRESS` → لو SQL Express (لاحظ الـ `\\` في JSON)
-   - `Server=(localdb)\\MSSQLLocalDB` → لو LocalDB
-3. من **Tools → NuGet Package Manager → Package Manager Console**:
+1. ظبط اسم السيرفر في `appsettings.json` → `ConnectionStrings:DefaultConnection`
+   (نفس اللي في خانة Server name في SSMS، مثلاً `Server=.\\SQLEXPRESS`).
+2. من Developer PowerShell في فولدر المشروع:
    ```
-   Add-Migration InitialCreate
-   Update-Database
+   dotnet ef migrations add InitialCreate
    ```
-   (أو من الـ terminal: `dotnet ef migrations add InitialCreate` ثم `dotnet ef database update`)
-4. اعمل Refresh في SSMS هتلاقي داتابيز `CinemaDashboardDb` فيها الجداول.
-5. شغّل المشروع (F5).
+3. شغّل المشروع (F5). عند التشغيل المشروع **بيعمل Update-Database لوحده**، وبيعمل الـ Roles وأول Admin.
+4. افتح `http://localhost:5070` وادخل بـ:
+   - Email: `admin@cinema.com`
+   - Password: `Admin@123`
+   (تقدر تغيرهم من `AdminUser` في `appsettings.json` قبل أول تشغيل)
 
-> ترتيب الإدخال: ضيف **Cinema** و **Actors** الأول (الـ Categories متضافة جاهزة)، وبعدين ضيف الـ **Movies**.
+## Identity
 
-## الجداول
-
-| Table | الأعمدة المهمة |
+| | |
 |---|---|
-| Categories | Id, Name, Description |
-| Cinemas | Id, Name, Address, Description, Img |
-| Actors | Id, Name, Bio, Img |
-| Movies | Id, Name, Description, Price, Status, DateTime, MainImg, CategoryId, CinemaId |
-| MovieImages | Id, Img, MovieId  ← الـ SubImages |
-| MovieActors | MovieId, ActorId  ← جدول وسيط Many-to-Many (List&lt;Actor&gt;) |
+| `ApplicationUser` | بيورث من `IdentityUser` + `FullName`, `CreatedAt` |
+| Roles | `Admin` (يدخل الداشبورد) و `User` (أي حد يعمل Register) |
+| صفحات | Login · Register · Logout · Access Denied |
+| Users page | الأدمن يقدر يرقّي يوزر لأدمن، يقفل/يفتح حساب، أو يمسحه |
+| الحماية | كل Controllers الداشبورد بتورث من `AdminController` اللي عليه `[Authorize(Roles = "Admin")]` |
+
+## SOLID — فين كل مبدأ في الكود
+
+| المبدأ | التطبيق |
+|---|---|
+| **S** — Single Responsibility | الـ Controllers بقت رفيعة (HTTP بس)، والـ business rules في `Services/Implementations`، والـ data access في `Repositories`. التحقق من الصور (`ImageValidator`) منفصل عن حفظها (`LocalFileStorage`). الـ DI كله في `Extensions/ServiceCollectionExtensions.cs`. |
+| **O** — Open/Closed | `Repository<T>` واحد شغال لأي Entity جديدة من غير كود جديد. قواعد رفع الصور في `appsettings.json` (`ImageUpload`) تتغير من غير ما تلمس الكود. |
+| **L** — Liskov Substitution | أي implementation لـ `IFileStorage` (مثلاً Azure Blob بدل الهارد) تتحط مكان `LocalFileStorage` والسيستم يفضل شغال بنفس الشكل. |
+| **I** — Interface Segregation | Interfaces صغيرة ومتخصصة: `IImageValidator` ≠ `IFileStorage`، `IAccountService` (دخول/تسجيل) ≠ `IUserService` (إدارة اليوزرز)، `ILookupService` للـ dropdowns بس. |
+| **D** — Dependency Inversion | كل Controller و Service بياخد Interfaces في الـ constructor (`ICategoryService`, `IUnitOfWork`...) ومفيش حد بيعمل `new` لـ class أو بيلمس `DbContext` غير الـ Repository. |
 
 ## هيكل المشروع
 
 ```
-Controllers/   Home (Dashboard), Categories, Cinemas, Actors, Movies
-Models/        Entities + MovieStatus enum
-Data/          ApplicationDbContext (Fluent API + seed categories)
-Services/      FileService (رفع/مسح الصور في wwwroot/images)
-ViewModels/    MovieFormVM, DashboardVM
-Views/         Razor views (Bootstrap 5)
+Constants/        AppRoles
+Controllers/      Base/AdminController + Home, Movies, Categories, Cinemas, Actors, Users, Account
+Data/             ApplicationDbContext (IdentityDbContext) + DbSeeder
+Extensions/       DI registration + ModelState helper
+Models/           Entities + ApplicationUser
+Repositories/     IRepository<T>, Repository<T>, IUnitOfWork, UnitOfWork
+Services/
+  Common/         ServiceResult
+  Files/          IImageValidator, IFileStorage, ImageUploadOptions
+  Interfaces/     I...Service
+  Implementations/
+ViewModels/
+Views/            + Account/, Users/, Shared/_AuthLayout
 ```
-
-## ملاحظات
-
-- الصور بتتحفظ في `wwwroot/images/{cinemas|actors|movies|movies/sub}` والـ DB بيتخزن فيها المسار بس.
-- مسموح: jpg / jpeg / png / gif / webp — حد أقصى 5MB للصورة.
-- مينفعش تمسح Category أو Cinema فيها أفلام (DeleteBehavior.Restrict) — بيظهر رسالة.
-- مسح فيلم بيمسح صوره والـ SubImages وعلاقاته بالممثلين.
-- الـ Status: Upcoming / Now Showing (Available) / Expired — بيتخزن كـ string في الداتابيز.

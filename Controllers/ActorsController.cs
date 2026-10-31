@@ -1,33 +1,22 @@
-using CinemaDashboard.Data;
+using CinemaDashboard.Controllers.Base;
+using CinemaDashboard.Extensions;
 using CinemaDashboard.Models;
-using CinemaDashboard.Services;
+using CinemaDashboard.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace CinemaDashboard.Controllers;
 
-public class ActorsController(ApplicationDbContext db, IFileService files) : Controller
+public class ActorsController(IActorService actors) : AdminController
 {
-    private const string ImgFolder = "actors";
-
     public async Task<IActionResult> Index(string? search)
     {
-        var query = db.Actors.AsNoTracking().Include(a => a.MovieActors).AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(search))
-            query = query.Where(a => a.Name.Contains(search));
-
         ViewBag.Search = search;
-        return View(await query.OrderBy(a => a.Name).ToListAsync());
+        return View(await actors.GetAllAsync(search));
     }
 
     public async Task<IActionResult> Details(int id)
     {
-        var actor = await db.Actors
-            .AsNoTracking()
-            .Include(a => a.MovieActors).ThenInclude(ma => ma.Movie)
-            .FirstOrDefaultAsync(a => a.Id == id);
-
+        var actor = await actors.GetDetailsAsync(id);
         return actor is null ? NotFound() : View(actor);
     }
 
@@ -36,67 +25,44 @@ public class ActorsController(ApplicationDbContext db, IFileService files) : Con
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Actor model, IFormFile? imgFile)
     {
-        var imgError = files.Validate(imgFile, required: true);
-        if (imgError is not null) ModelState.AddModelError("imgFile", imgError);
-
         if (!ModelState.IsValid) return View("Form", model);
 
-        model.Img = await files.SaveAsync(imgFile!, ImgFolder);
-        db.Actors.Add(model);
-        await db.SaveChangesAsync();
+        var result = await actors.CreateAsync(model, imgFile);
+        if (!result.Succeeded)
+        {
+            ModelState.AddServiceErrors(result);
+            return View("Form", model);
+        }
 
-        TempData["Success"] = $"Actor \"{model.Name}\" added.";
-        return RedirectToAction(nameof(Index));
+        return RedirectWithResult(result);
     }
 
     public async Task<IActionResult> Edit(int id)
     {
-        var actor = await db.Actors.FindAsync(id);
+        var actor = await actors.GetByIdAsync(id);
         return actor is null ? NotFound() : View("Form", actor);
     }
 
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(Actor model, IFormFile? imgFile)
     {
-        var actor = await db.Actors.FindAsync(model.Id);
-        if (actor is null) return NotFound();
-
-        var imgError = files.Validate(imgFile, required: false);
-        if (imgError is not null) ModelState.AddModelError("imgFile", imgError);
-
         if (!ModelState.IsValid)
         {
-            model.Img = actor.Img;
+            model.Img = (await actors.GetByIdAsync(model.Id))?.Img;
             return View("Form", model);
         }
 
-        actor.Name = model.Name;
-        actor.Bio = model.Bio;
-
-        if (imgFile is not null && imgFile.Length > 0)
+        var result = await actors.UpdateAsync(model, imgFile);
+        if (result.NotFound) return NotFound();
+        if (!result.Succeeded)
         {
-            files.Delete(actor.Img);
-            actor.Img = await files.SaveAsync(imgFile, ImgFolder);
+            ModelState.AddServiceErrors(result);
+            return View("Form", model);
         }
 
-        await db.SaveChangesAsync();
-
-        TempData["Success"] = $"Actor \"{actor.Name}\" updated.";
-        return RedirectToAction(nameof(Index));
+        return RedirectWithResult(result);
     }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id)
-    {
-        var actor = await db.Actors.FindAsync(id);
-        if (actor is null) return NotFound();
-
-        // MovieActor rows are removed automatically (cascade)
-        files.Delete(actor.Img);
-        db.Actors.Remove(actor);
-        await db.SaveChangesAsync();
-
-        TempData["Success"] = $"Actor \"{actor.Name}\" deleted.";
-        return RedirectToAction(nameof(Index));
-    }
+    public async Task<IActionResult> Delete(int id) => RedirectWithResult(await actors.DeleteAsync(id));
 }

@@ -1,17 +1,18 @@
 using CinemaDashboard.Data;
-using CinemaDashboard.Services;
-using Microsoft.EntityFrameworkCore;
+using CinemaDashboard.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddScoped<IFileService, FileService>();
+builder.Services
+    .AddDataAccess(builder.Configuration)
+    .AddAppIdentity()
+    .AddAppServices(builder.Configuration);
 
 var app = builder.Build();
+
+// Applies migrations + creates roles and the first Admin
+await DbSeeder.SeedAsync(app.Services);
 
 if (!app.Environment.IsDevelopment())
 {
@@ -27,7 +28,9 @@ app.UseRequestLocalization("en-US");
 
 app.UseStaticFiles();   // serves wwwroot, including uploaded images
 app.UseRouting();
-app.UseAuthorization();
+
+app.UseAuthentication(); // who are you?  (must come before UseAuthorization)
+app.UseAuthorization();  // are you allowed?
 
 app.MapControllerRoute(
     name: "default",

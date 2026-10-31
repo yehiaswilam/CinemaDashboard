@@ -1,0 +1,80 @@
+@model List<UserListItemVM>
+@{
+    ViewData["Title"] = "Users";
+}
+
+<div class="page-header">
+    <h1>Users <span class="text-muted fs-6">(@Model.Count)</span></h1>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Joined</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">
+                            @u.FullName
+                            @if (u.IsCurrentUser)
+                            {
+                                <span class="badge text-bg-light ms-1">you</span>
+                            }
+                        </td>
+                        <td>@u.Email</td>
+                        <td>
+                            @if (u.IsAdmin)
+                            {
+                                <span class="badge bg-danger-subtle text-danger-emphasis">Admin</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary-subtle text-secondary-emphasis">User</span>
+                            }
+                        </td>
+                        <td>
+                            @if (u.IsLocked)
+                            {
+                                <span class="badge bg-warning-subtle text-warning-emphasis"><i class="bi bi-lock"></i> Locked</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success-subtle text-success-emphasis">Active</span>
+                            }
+                        </td>
+                        <td class="text-nowrap text-muted">@u.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
+                        <td class="text-end text-nowrap">
+                            @if (!u.IsCurrentUser)
+                            {
+                                <form asp-action="ToggleAdmin" asp-route-id="@u.Id" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary" title="@(u.IsAdmin ? "Remove admin" : "Make admin")">
+                                        <i class="bi @(u.IsAdmin ? "bi-person-dash" : "bi-person-gear")"></i>
+                                    </button>
+                                </form>
+                                <form asp-action="ToggleLock" asp-route-id="@u.Id" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary" title="@(u.IsLocked ? "Unlock" : "Lock")">
+                                        <i class="bi @(u.IsLocked ? "bi-unlock" : "bi-lock")"></i>
+                                    </button>
+                                </form>
+                                <form asp-action="Delete" asp-route-id="@u.Id" method="post" class="d-inline"
+                                      data-confirm="Delete user &quot;@u.Email&quot;? This can't be undone.">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

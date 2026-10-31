@@ -1,9 +1,12 @@
 using CinemaDashboard.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace CinemaDashboard.Data;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
+// IdentityDbContext adds the AspNetUsers / AspNetRoles / AspNetUserRoles ... tables
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+    : IdentityDbContext<ApplicationUser>(options)
 {
     public DbSet<Category> Categories => Set<Category>();
     public DbSet<Cinema> Cinemas => Set<Cinema>();
