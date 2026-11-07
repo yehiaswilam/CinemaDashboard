@@ -31,7 +31,13 @@
                                 <span class="badge text-bg-light ms-1">you</span>
                             }
                         </td>
-                        <td>@u.Email</td>
+                        <td>
+                            @u.Email
+                            @if (!u.EmailConfirmed)
+                            {
+                                <span class="badge bg-warning-subtle text-warning-emphasis ms-1" title="Email not confirmed yet">unconfirmed</span>
+                            }
+                        </td>
                         <td>
                             @if (u.IsAdmin)
                             {
@@ -54,6 +60,14 @@
                         </td>
                         <td class="text-nowrap text-muted">@u.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")</td>
                         <td class="text-end text-nowrap">
+                            @if (!u.EmailConfirmed)
+                            {
+                                <form asp-action="ConfirmEmail" asp-route-id="@u.Id" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-success" title="Confirm email manually">
+                                        <i class="bi bi-envelope-check"></i>
+                                    </button>
+                                </form>
+                            }
                             @if (!u.IsCurrentUser)
                             {
                                 <form asp-action="ToggleAdmin" asp-route-id="@u.Id" method="post" class="d-inline">

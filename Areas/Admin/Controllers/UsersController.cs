@@ -22,4 +22,8 @@ public class UsersController(IUserService users) : AdminController
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(string id) =>
         RedirectWithResult(await users.DeleteAsync(id, CurrentUserId));
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ConfirmEmail(string id) =>
+        RedirectWithResult(await users.ConfirmEmailAsync(id));
 }

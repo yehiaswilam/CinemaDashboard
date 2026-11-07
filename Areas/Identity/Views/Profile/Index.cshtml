@@ -1,0 +1,77 @@
+@model ProfileVM
+@{
+    ViewData["Title"] = "My profile";
+}
+
+<h1 class="h3 fw-bold mb-4">My account</h1>
+
+<div class="row g-4">
+    <div class="col-md-3">
+        <partial name="_ProfileNav" />
+    </div>
+
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-body p-4">
+                <form asp-action="Index" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        @if (!string.IsNullOrEmpty(Model.ProfileImage))
+                        {
+                            <img id="avatarPreview" src="@Model.ProfileImage" class="profile-avatar" alt="" />
+                        }
+                        else
+                        {
+                            <img id="avatarPreview" class="profile-avatar d-none" alt="" />
+                            <div id="avatarPlaceholder" class="profile-avatar-placeholder">
+                                @(string.IsNullOrEmpty(Model.FullName) ? "?" : Model.FullName[..1].ToUpper())
+                            </div>
+                        }
+                        <div>
+                            <label asp-for="ImageFile" class="form-label"></label>
+                            <input asp-for="ImageFile" type="file" accept="image/*" class="form-control form-control-sm" id="imageInput" />
+                            <span asp-validation-for="ImageFile" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input value="@Model.Email" class="form-control" disabled />
+                        @if (Model.ExternalLogins.Any())
+                        {
+                            <div class="form-text"><i class="bi bi-link-45deg"></i> Linked with @string.Join(", ", Model.ExternalLogins)</div>
+                        }
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="PhoneNumber" class="form-label"></label>
+                        <input asp-for="PhoneNumber" class="form-control" />
+                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Preview the chosen picture before saving
+        document.getElementById('imageInput').addEventListener('change', function () {
+            if (!this.files || !this.files[0]) return;
+            const img = document.getElementById('avatarPreview');
+            img.src = URL.createObjectURL(this.files[0]);
+            img.classList.remove('d-none');
+            document.getElementById('avatarPlaceholder')?.remove();
+        });
+    </script>
+}

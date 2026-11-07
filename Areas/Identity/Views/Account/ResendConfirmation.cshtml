@@ -1,0 +1,18 @@
+@model ResendConfirmationVM
+@{
+    ViewData["Title"] = "Resend confirmation";
+}
+
+<h1 class="h4 fw-bold mb-1">Resend confirmation email</h1>
+<p class="text-muted small mb-4">Enter the email you registered with and we'll send a new link.</p>
+
+<form asp-action="ResendConfirmation" method="post">
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" autocomplete="email" autofocus />
+        <span asp-validation-for="Email" class="text-danger small"></span>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">Send link</button>
+</form>
+
+<p class="text-center small mt-4 mb-0"><a asp-action="Login">Back to sign in</a></p>

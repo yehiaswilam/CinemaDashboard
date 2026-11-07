@@ -10,4 +10,8 @@ public class ApplicationUser : IdentityUser
     public string FullName { get; set; } = string.Empty;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    // Relative URL of the profile picture, e.g. /images/profiles/abc.jpg
+    [MaxLength(300)]
+    public string? ProfileImage { get; set; }
 }

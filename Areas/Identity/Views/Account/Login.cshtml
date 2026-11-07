@@ -1,6 +1,7 @@
 @model LoginVM
 @{
     ViewData["Title"] = "Sign in";
+    var providers = ViewBag.ExternalProviders as List<ExternalProviderVM> ?? new List<ExternalProviderVM>();
 }
 
 <h1 class="h4 fw-bold mb-1">Welcome back</h1>
@@ -17,7 +18,10 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="Password" class="form-label"></label>
+        <div class="d-flex justify-content-between">
+            <label asp-for="Password" class="form-label"></label>
+            <a asp-action="ForgotPassword" class="small">Forgot password?</a>
+        </div>
         <input asp-for="Password" class="form-control" autocomplete="current-password" />
         <span asp-validation-for="Password" class="text-danger small"></span>
     </div>
@@ -30,6 +34,23 @@
     <button type="submit" class="btn btn-primary w-100">Sign in</button>
 </form>
 
-<p class="text-center small mt-4 mb-0">
+@if (providers.Any())
+{
+    <div class="auth-divider"><span>or</span></div>
+
+    <form asp-action="ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+        @foreach (var p in providers)
+        {
+            <button type="submit" name="provider" value="@p.Name" class="btn btn-outline-secondary w-100 mb-2">
+                <i class="bi bi-@p.Name.ToLowerInvariant() me-1"></i> Continue with @p.DisplayName
+            </button>
+        }
+    </form>
+}
+
+<p class="text-center small mt-4 mb-1">
     No account? <a asp-action="Register">Create one</a>
+</p>
+<p class="text-center small mb-0">
+    Didn't get the confirmation email? <a asp-action="ResendConfirmation" asp-route-email="@Model.Email">Resend it</a>
 </p>

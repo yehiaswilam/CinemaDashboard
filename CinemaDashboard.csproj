@@ -5,10 +5,13 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>CinemaDashboard</RootNamespace>
+    <!-- Gmail / Google keys go in user-secrets (never in appsettings.json — this repo is public) -->
+    <UserSecretsId>cinema-dashboard-3be9cbe8</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <!-- 10.0.* = always the latest 10.0 patch (also clears the "packages with vulnerabilities" warning) -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="10.0.*" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.*" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.*">

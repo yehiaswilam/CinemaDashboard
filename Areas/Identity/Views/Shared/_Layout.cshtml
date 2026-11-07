@@ -17,7 +17,11 @@
 
             @if (TempData["Success"] is string ok)
             {
-                <div class="alert alert-success">@ok</div>
+                <div class="alert alert-success small">@ok</div>
+            }
+            @if (TempData["Error"] is string err)
+            {
+                <div class="alert alert-danger small">@err</div>
             }
 
             @RenderBody()

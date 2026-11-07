@@ -1,6 +1,7 @@
 using CinemaDashboard.Data;
 using CinemaDashboard.Models;
 using CinemaDashboard.Repositories;
+using CinemaDashboard.Services.Email;
 using CinemaDashboard.Services.Files;
 using CinemaDashboard.Services.Implementations;
 using CinemaDashboard.Services.Interfaces;
@@ -26,7 +27,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddAppIdentity(this IServiceCollection services)
+    public static IServiceCollection AddAppIdentity(this IServiceCollection services, IConfiguration config)
     {
         services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
@@ -36,6 +37,9 @@ public static class ServiceCollectionExtensions
                 options.Password.RequireUppercase = false;
                 options.Lockout.MaxFailedAccessAttempts = 5;
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+
+                // Users must click the link in the confirmation email before they can sign in
+                options.SignIn.RequireConfirmedEmail = true;
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
@@ -48,6 +52,21 @@ public static class ServiceCollectionExtensions
             options.ExpireTimeSpan = TimeSpan.FromDays(7);
             options.SlidingExpiration = true;
         });
+
+        // Confirmation / reset links stay valid for 24 hours
+        services.Configure<DataProtectionTokenProviderOptions>(o => o.TokenLifespan = TimeSpan.FromHours(24));
+
+        // Google sign-in is switched on only when its keys are in appsettings / user-secrets
+        var googleId = config["Authentication:Google:ClientId"];
+        var googleSecret = config["Authentication:Google:ClientSecret"];
+        if (!string.IsNullOrWhiteSpace(googleId) && !string.IsNullOrWhiteSpace(googleSecret))
+        {
+            services.AddAuthentication().AddGoogle(options =>
+            {
+                options.ClientId = googleId!;
+                options.ClientSecret = googleSecret!;
+            });
+        }
 
         return services;
     }
@@ -67,8 +86,22 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMovieService, MovieService>();
         services.AddScoped<IDashboardService, DashboardService>();
 
-        // Identity-related
+        // Email: real SMTP when EmailSettings is filled in, otherwise print to the console (same interface — LSP)
+        var emailSection = config.GetSection(EmailSettings.SectionName);
+        services.Configure<EmailSettings>(emailSection);
+        if (emailSection.Get<EmailSettings>()?.IsConfigured == true)
+            services.AddScoped<IEmailService, SmtpEmailService>();
+        else
+            services.AddScoped<IEmailService, ConsoleEmailService>();
+
+        services.AddHttpContextAccessor();
+        services.AddScoped<IAccountLinkBuilder, AccountLinkBuilder>();
+
+        // Identity-related (small, focused interfaces — ISP)
         services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<IEmailConfirmationService, EmailConfirmationService>();
+        services.AddScoped<IPasswordService, PasswordService>();
+        services.AddScoped<IProfileService, ProfileService>();
         services.AddScoped<IUserService, UserService>();
 
         return services;

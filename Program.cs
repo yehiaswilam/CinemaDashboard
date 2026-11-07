@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services
     .AddDataAccess(builder.Configuration)
-    .AddAppIdentity()
+    .AddAppIdentity(builder.Configuration)
     .AddAppServices(builder.Configuration);
 
 var app = builder.Build();

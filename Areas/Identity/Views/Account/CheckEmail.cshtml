@@ -1,0 +1,18 @@
+@model string?
+@{
+    ViewData["Title"] = "Check your email";
+}
+
+<div class="text-center">
+    <i class="bi bi-envelope-check display-5 text-primary"></i>
+    <h1 class="h4 fw-bold mt-3">Check your email</h1>
+    <p class="text-muted">
+        If <strong>@(string.IsNullOrEmpty(Model) ? "your address" : Model)</strong> belongs to an account that still needs confirming,
+        we've sent it a confirmation link. Open it to activate your account, then sign in.
+    </p>
+    <a asp-action="Login" class="btn btn-primary">Go to sign in</a>
+    <p class="small text-muted mt-4 mb-0">
+        Nothing arrived? Check your spam folder, or
+        <a asp-action="ResendConfirmation" asp-route-email="@Model">send it again</a>.
+    </p>
+</div>

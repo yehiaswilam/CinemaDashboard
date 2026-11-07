@@ -23,6 +23,7 @@ public class UserService(UserManager<ApplicationUser> userManager) : IUserServic
             IsAdmin = admins.Contains(u.Id),
             IsLocked = u.LockoutEnd is not null && u.LockoutEnd > DateTimeOffset.UtcNow,
             IsCurrentUser = u.Id == currentUserId,
+            EmailConfirmed = u.EmailConfirmed,
             CreatedAt = u.CreatedAt
         }).ToList();
     }
@@ -78,6 +79,19 @@ public class UserService(UserManager<ApplicationUser> userManager) : IUserServic
         var result = await userManager.DeleteAsync(user);
         return result.Succeeded
             ? ServiceResult.Success($"{user.Email} deleted.")
+            : ServiceResult.Failure(string.Join(" ", result.Errors.Select(e => e.Description)));
+    }
+
+    public async Task<ServiceResult> ConfirmEmailAsync(string userId)
+    {
+        var user = await userManager.FindByIdAsync(userId);
+        if (user is null) return ServiceResult.NotFoundResult();
+        if (user.EmailConfirmed) return ServiceResult.Success($"{user.Email} is already confirmed.");
+
+        user.EmailConfirmed = true;
+        var result = await userManager.UpdateAsync(user);
+        return result.Succeeded
+            ? ServiceResult.Success($"{user.Email} confirmed.")
             : ServiceResult.Failure(string.Join(" ", result.Errors.Select(e => e.Description)));
     }
 }

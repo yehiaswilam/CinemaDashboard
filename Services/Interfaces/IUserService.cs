@@ -10,4 +10,7 @@ public interface IUserService
     Task<ServiceResult> ToggleAdminAsync(string userId, string currentUserId);
     Task<ServiceResult> ToggleLockAsync(string userId, string currentUserId);
     Task<ServiceResult> DeleteAsync(string userId, string currentUserId);
+
+    /// <summary>Lets an admin activate an account whose owner never got the email.</summary>
+    Task<ServiceResult> ConfirmEmailAsync(string userId);
 }

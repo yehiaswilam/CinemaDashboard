@@ -1,0 +1,22 @@
+@using CinemaDashboard.Services.Common
+@model ServiceResult
+@{
+    ViewData["Title"] = "Confirm email";
+}
+
+<div class="text-center">
+    @if (Model.Succeeded)
+    {
+        <i class="bi bi-patch-check display-5 text-success"></i>
+        <h1 class="h4 fw-bold mt-3">Email confirmed</h1>
+        <p class="text-muted">@Model.Message</p>
+        <a asp-action="Login" class="btn btn-primary">Sign in</a>
+    }
+    else
+    {
+        <i class="bi bi-x-octagon display-5 text-danger"></i>
+        <h1 class="h4 fw-bold mt-3">Link didn't work</h1>
+        <p class="text-muted">@Model.ErrorMessage</p>
+        <a asp-action="ResendConfirmation" class="btn btn-primary">Send a new link</a>
+    }
+</div>
